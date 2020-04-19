@@ -1,6 +1,4 @@
-// require json where notes array is stored
 // require fs
-// var db = require("./../db/db.json");
 var fs = require("fs")
 
 // export express "get" making JSON file with notes array
@@ -38,32 +36,39 @@ module.exports = function(app) {
             notes.push(newNote);
 
             fs.writeFile('db/db.json', JSON.stringify(notes),'UTF-8', function(err) {
-
                 if (err) {
                   return console.log(err);
                 }
                 res.json(newNote);
             });
         })
-        
-        // db.push(newNote);
-        // res.json(true);
-        
     });
 
 
    // API delete route to remove the selected note from array
-    // app.post("/test/:id", function(req,res) {
-    //   for (var i = 0; i < db.length; i++){
-    //     if(db[i].id === req.params.id){
-    //       db[i].delete;
-    //     }
-    //     else{
-    //       console.log("nothing to delete")
-    //     }
-    //   }
-    //   res.json(db);
-    // });
-
     
+    app.post("/api/notes/:id", function(req, res) {
+        var idDelete = req.body.id;
+        var notes = [];
+
+        fs.readFile('db/db.json', "utf8", function(err, data) {
+            if(err){
+                return console.log(err)
+            }
+            notes = JSON.parse(data);
+            
+            for (var i = 0; i < notes.length; i++){
+                if(notes[i].id === idDelete){
+                    notes.splice(i,1)
+                }
+            }
+
+            fs.writeFile('db/db.json', JSON.stringify(notes),'UTF-8', function(err) {
+                if (err) {
+                    return console.log(err);
+                }
+                res.json(notes);
+            });
+        })
+    });
 }
